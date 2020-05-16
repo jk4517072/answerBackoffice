@@ -18,6 +18,9 @@ public class Constant {
     public static final String TOKEN_LOGOUT_URL = "/token/logout";
     public static final int TOKEN_EXPIRE = 60 * 60 * 24 * 7;
 
+    //入参错误编码
+    public static final int PARAM_ERROR=101;
+
 	/** 超级管理员ID */
 	public static final int SUPER_ADMIN = 1;
 

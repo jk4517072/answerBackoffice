@@ -26,13 +26,28 @@ public class MPPageConvert {
     public <T> IPage<T> pageParamConvert(Map<String, Object> param){
         int currPage = 1;
         int limit = 10;
+        String order= null;
+        String sidx = null;
         if(MapUtil.getInt(param,"page") != null){
             currPage = MapUtil.getInt(param,"page");
         }
         if(MapUtil.getInt(param,"limit") != null){
             limit = MapUtil.getInt(param,"limit");
         }
-        IPage<T> page = new Page<>(currPage,limit);
+        if(MapUtil.getStr(param,"order") != null){
+            order = MapUtil.getStr(param,"order");
+        }
+        if(MapUtil.getStr(param,"sidx") != null){
+            sidx = MapUtil.getStr(param,"sidx");
+        }
+        Page<T> page = new Page<>(currPage,limit);
+        if(!CommonUtils.isNull(sidx)){
+            if("asc".equals(order)){
+                page.setAsc(sidx);
+            }else{
+                page.setDesc(sidx);
+            }
+        }
         return page;
     }
 

@@ -14,4 +14,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @date 2020-05-16 14:33:41
  */
 public interface TbSubjectService extends IService<TbSubject> {
+
+    public IPage<TbSubject> getCustomMadePage(IPage<TbSubject> page, Wrapper<TbSubject> queryWrapper);
 }
