@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,12 +19,8 @@ import java.util.Date;
  * @date 2020-05-16 14:33:41
  */
 @Data
-@TableName("tb_subject")
-@EqualsAndHashCode(callSuper = true)
-public class TbSubject extends Model<TbSubject> implements Serializable {
+public class TbSubjectVo  implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-		@TableId
 		private Integer id;
 		//类型:1选择题 2.判断题
 		private String type;
@@ -32,7 +29,13 @@ public class TbSubject extends Model<TbSubject> implements Serializable {
 		//题目
 		private String subject;
 		//选择A/选择√
-		private String options;
+		private String choice1;
+		//选择A/选择√
+		private String choice2;
+		//选择A/选择√
+		private String choice3;
+		//选择A/选择√
+		private String choice4;
 		//回答记录：1对，2错
 		private Integer isanswer;
 		//正确选择

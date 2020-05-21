@@ -1,13 +1,17 @@
 package com.suke.czx.modules.subject.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.suke.czx.modules.subject.entity.TbSubjectVo;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.writer.BeansMapper;
 import org.springframework.stereotype.Service;
 import com.suke.czx.modules.subject.mapper.TbSubjectMapper;
 import com.suke.czx.modules.subject.entity.TbSubject;
@@ -42,6 +46,9 @@ public class TbSubjectServiceImpl extends ServiceImpl<TbSubjectMapper, TbSubject
         JSONObject jsonObject=null;
         StringBuffer stringBuffer =null;
         for (TbSubject tbSubject:list) {
+            if ("判断题".equals(tbSubject.getType())){
+                tbSubject.setOptions("<br>A对</br><br>B错</br>");
+            }
             stringBuffer =new StringBuffer();
             try {
                 jsonArray = JSONArray.parseArray(tbSubject.getOptions());
@@ -57,5 +64,31 @@ public class TbSubjectServiceImpl extends ServiceImpl<TbSubjectMapper, TbSubject
             }
         }
         return sysConfigList;
+    }
+
+    @Override
+    public TbSubjectVo getHandleTbSubject(Integer id) {
+        TbSubject tbSubject =super.getById(id);
+        TbSubjectVo tbSubjectVo=new TbSubjectVo();
+        BeanUtil.copyProperties(tbSubject,tbSubjectVo);
+        JSONArray jsonArray=JSONArray.parseArray(tbSubject.getOptions());
+        Iterator<Object> iterable= jsonArray.iterator();
+        String label=null;
+        String text = null;
+        while (iterable.hasNext()){
+            JSONObject jsonObject=(JSONObject) iterable.next();
+            label=jsonObject.getString("label");
+            text = jsonObject.getString("text");
+            if("A".equals(label)){
+                tbSubjectVo.setChoice1(text);
+            }else if("B".equals(label)){
+                tbSubjectVo.setChoice2(text);
+            }else if("C".equals(label)){
+                tbSubjectVo.setChoice3(text);
+            }else if("D".equals(label)){
+                tbSubjectVo.setChoice4(text);
+            }
+        }
+        return tbSubjectVo;
     }
 }

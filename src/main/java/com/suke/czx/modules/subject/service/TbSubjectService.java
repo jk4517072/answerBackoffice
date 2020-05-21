@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.suke.czx.modules.subject.entity.TbSubject;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.suke.czx.modules.subject.entity.TbSubjectVo;
 
 /**
  * 题库表
@@ -15,5 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface TbSubjectService extends IService<TbSubject> {
 
-    public IPage<TbSubject> getCustomMadePage(IPage<TbSubject> page, Wrapper<TbSubject> queryWrapper);
+    IPage<TbSubject> getCustomMadePage(IPage<TbSubject> page, Wrapper<TbSubject> queryWrapper);
+
+    TbSubjectVo getHandleTbSubject(Integer id);
 }

@@ -52,6 +52,14 @@ public class TbSubjectController  extends AbstractController {
         return R.ok().put("page", mpPageConvert.pageValueConvert(sysConfigList));
     }
 
+    @RequestMapping("/testList")
+    @PreAuthorize("hasRole('xcx:user:list')")
+    public R getSubject(@RequestParam Map<String, Object> params){
+        //查询列表数据
+        QueryWrapper<TbSubject> queryWrapper = new QueryWrapper<>();
+        IPage<TbSubject> sysConfigList = tbSubjectService.getCustomMadePage(mpPageConvert.<TbSubject>pageParamConvert(params),queryWrapper);
+        return R.ok().put("page", mpPageConvert.pageValueConvert(sysConfigList));
+    }
 
     /**
      * 信息
@@ -59,7 +67,7 @@ public class TbSubjectController  extends AbstractController {
     @RequestMapping("/info/{id}")
     @PreAuthorize("hasRole('subject:tbsubject:info')")
     public R info(@PathVariable("id") Integer id){
-        return R.ok().put("tbSubject", tbSubjectService.getById(id));
+        return R.ok().put("tbSubject", tbSubjectService.getHandleTbSubject(id));
     }
 
 
@@ -77,6 +85,52 @@ public class TbSubjectController  extends AbstractController {
         String choice2= String.valueOf(params.get("choice2"));
         String choice3= String.valueOf(params.get("choice3"));
         String choice4= String.valueOf(params.get("choice4"));
+        R response = checkResquestionParams(type, subject, rightChoice, choice1, choice2, choice3, choice4);
+        if(response != null){
+            return response;
+        }
+        tbSubjectService.save(handleParams(null,type, subject, rightChoice, choice1, choice2, choice3, choice4));
+        return R.ok();
+    }
+
+
+    /**
+     * 修改
+     */
+    @SysLog("修改题库表数据")
+    @RequestMapping("/update")
+    @PreAuthorize("hasRole('subject:tbsubject:update')")
+    public R update(@RequestBody Map<String, Object> params){
+        String id = String.valueOf(params.get("id"));
+        String type= String.valueOf(params.get("type"));
+        String subject= String.valueOf(params.get("subject"));
+        String rightChoice=String.valueOf(params.get("rightChoice"));
+        String choice1= String.valueOf(params.get("choice1"));
+        String choice2= String.valueOf(params.get("choice2"));
+        String choice3= String.valueOf(params.get("choice3"));
+        String choice4= String.valueOf(params.get("choice4"));
+        R response = checkResquestionParams(type, subject, rightChoice, choice1, choice2, choice3, choice4);
+        if(response != null){
+            return response;
+        }
+		tbSubjectService.updateById(handleParams(id,type, subject, rightChoice, choice1, choice2, choice3, choice4));
+        return R.ok();
+    }
+
+
+    /**
+     * 删除
+     */
+    @SysLog("删除题库表数据")
+    @RequestMapping("/delete")
+    @PreAuthorize("hasRole('subject:tbsubject:delete')")
+    public R delete(@RequestBody Integer[] ids){
+		tbSubjectService.removeByIds(Arrays.asList(ids));
+        return R.ok();
+    }
+
+    public R checkResquestionParams(String type,String subject,String rightChoice,String choice1,
+                                    String choice2, String choice3,String choice4){
         if(CommonUtils.isNull(type) || "0".equals(type)){
             return R.error(Constant.PARAM_ERROR,"type 不能为空");
         }
@@ -96,15 +150,23 @@ public class TbSubjectController  extends AbstractController {
             if(CommonUtils.isNull(choice3)){
                 return R.error(Constant.PARAM_ERROR,"选择C,不能为空");
             }
-        }else{
-            if(CommonUtils.isNull(choice1)){
-                return R.error(Constant.PARAM_ERROR,"判断A,不能为空");
-            }
-            if(CommonUtils.isNull(choice2)){
-                return R.error(Constant.PARAM_ERROR,"判断B,不能为空");
+        }
+        if("判断题".equals(type)){
+            if(!"A".equals(rightChoice) && !"B".equals(rightChoice)){
+                return R.error(Constant.PARAM_ERROR,"判断题的正确选择为:对和错，请修改");
             }
         }
+        return null;
+    }
+
+
+    public TbSubject handleParams(String id,String type,String subject,String rightChoice,String choice1,
+                                  String choice2, String choice3,String choice4){
+
         TbSubject tbSubject=new TbSubject();
+        if (!CommonUtils.isNull(id)){
+            tbSubject.setId(Integer.valueOf(id));
+        }
         tbSubject.setType(type);
         tbSubject.setSubject(subject);
         tbSubject.setTitle(subject.length()>10? subject.substring(0,10):subject);
@@ -133,33 +195,6 @@ public class TbSubjectController  extends AbstractController {
             jsonArray.add(jsonObject);
         }
         tbSubject.setOptions(jsonArray.toJSONString());
-        tbSubjectService.save(tbSubject);
-        return R.ok();
+        return tbSubject;
     }
-
-
-    /**
-     * 修改
-     */
-    @SysLog("修改题库表数据")
-    @RequestMapping("/update")
-    @PreAuthorize("hasRole('subject:tbsubject:update')")
-    public R update(@RequestBody TbSubject tbSubject){
-		tbSubjectService.updateById(tbSubject);
-        return R.ok();
-    }
-
-
-    /**
-     * 删除
-     */
-    @SysLog("删除题库表数据")
-    @RequestMapping("/delete")
-    @PreAuthorize("hasRole('subject:tbsubject:delete')")
-    public R delete(@RequestBody Integer[] ids){
-		tbSubjectService.removeByIds(Arrays.asList(ids));
-        return R.ok();
-    }
-
-
 }
